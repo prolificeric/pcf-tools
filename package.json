@@ -1,0 +1,29 @@
+{
+  "name": "pcf-tools",
+  "version": "0.0.1",
+  "description": "Stuff that helps you develop and consume APIs.",
+  "main": "index.js",
+  "bin": {
+    "pcf": "./bin/pcf"
+  },
+  "dependencies": {
+    "aglio": "^1.17.1",
+    "commander": "^2.6.0",
+    "content-tree": "^0.0.1",
+    "handlebars": "^2.0.0",
+    "lodash": "^2.4.1",
+    "napa": "^1.1.0",
+    "protagonist": "^0.17.1",
+    "q": "^1.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "napa"
+  },
+  "napa": {
+    "matter_compiler": "https://github.com/apiaryio/matter_compiler.git"
+  },
+  "author": "Eric Weber <eric@prolificinteractive.com>",
+  "license": "MIT"
+}

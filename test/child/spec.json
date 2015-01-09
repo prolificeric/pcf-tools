@@ -1,0 +1,9 @@
+{
+  "name": "Child Spec",
+  "inherit": "../parent",
+  "features": [
+    "overview",
+    "products",
+    "child-specific"
+  ]
+}

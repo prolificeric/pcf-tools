@@ -1,0 +1,28 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var Q = require('Q');
+var pkg = require('../package.json');
+var Spec = require('../lib/Spec');
+
+Q.longStackSupport = true;
+
+program.version(pkg.version);
+
+program
+  .command('build [dir]')
+  .description('Assemble API Blueprint from directory')
+  .action(function (dir, options) {
+    Spec
+      .load(dir)
+      .then(function (spec) {
+        return spec.loadBlueprint();
+      })
+      .done(function (blueprint) {
+        console.log(blueprint);
+      }, function (err) {
+        throw err;
+      });
+  });
+
+program.parse(process.argv);
