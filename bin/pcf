@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+var path = require('path');
 var program = require('commander');
 var Q = require('Q');
 var request = require('request');
@@ -39,6 +40,16 @@ program
   .command('publish [dir] [url]')
   .description('Publish to a PCF server')
   .action(function (dir, url, options) {
+    var config = require(path.resolve(process.cwd(), dir, 'spec.json'));
+    var version = config.version || null;
+
+    if (!version) {
+      process.stderr.write("spec.json file missing a 'version' property.\n");
+      process.exit();
+    }
+
+    var postUri = url + '/' + version;
+
     Spec
       .load(dir)
       .then(function (spec) {
@@ -47,7 +58,7 @@ program
       .done(function (blueprint) {
         request({
           method: 'POST',
-          uri: url,
+          uri: postUri,
           body: blueprint,
           headers: {
             'Content-Type': 'text/plain'
@@ -64,7 +75,7 @@ program
             if (data.error) {
               process.stderr.write('API error: ' + data.error.message);
             } else {
-              console.log('Spec published to %s.', url)
+              console.log('Spec published to %s', postUri);
             }
           } catch (err) {
             process.stderr.write('API error: ' + response.body);
