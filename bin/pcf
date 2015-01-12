@@ -6,7 +6,6 @@ var Q = require('Q');
 var request = require('request');
 var pkg = require('../package.json');
 var Spec = require('../lib/Spec');
-var app = require('../lib/app');
 
 Q.longStackSupport = true;
 
@@ -32,23 +31,26 @@ program
   .command('server <port>')
   .description('Run a server at specified port')
   .action(function (port, options) {
-    app.listen(port);
+    require('../lib/app').listen(port);
   });
 
-
 program
-  .command('publish [dir] [url]')
+  .command('publish [dir] [baseUrl]')
   .description('Publish to a PCF server')
-  .action(function (dir, url, options) {
+  .action(function (dir, baseUrl, options) {
     var config = require(path.resolve(process.cwd(), dir, 'spec.json'));
-    var version = config.version || null;
 
-    if (!version) {
+    if (!config.name) {
+      process.stderr.write("spec.json file missing a 'name' property.\n");
+      process.exit();
+    }
+
+    if (!config.version) {
       process.stderr.write("spec.json file missing a 'version' property.\n");
       process.exit();
     }
 
-    var postUri = url + '/' + version;
+    var postUri = baseUrl + '/' + config.name + '/' + config.version;
 
     Spec
       .load(dir)
