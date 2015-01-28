@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var path = require('path');
+var exec = require('child_process').exec;
 var program = require('commander');
 var Q = require('Q');
 var request = require('request');
@@ -26,12 +27,30 @@ program
         throw err;
       });
   });
-  
+
 program
   .command('server <port>')
   .description('Run a server at specified port')
   .action(function (port, options) {
     require('../lib/app').listen(port);
+  });
+
+program
+  .command('test [dir] [baseUrl]')
+  .description('Test API server against specs.')
+  .option('-r, --reporter <reporter>', 'The mocha reporter to use.')
+  .action(function (dir, baseUrl, options) {
+    var testPath = path.resolve(__dirname, '../lib/endpointTests.js');
+    var mochaPath = path.resolve(__dirname, '../node_modules/.bin/mocha');
+    exec('SPEC_DIR=' + dir + ' BASE_URL=' + baseUrl + ' ' + mochaPath + ' --reporter ' + options.reporter + ' ' + testPath, function (err, stdout, stderr) {
+      if (stdout) {
+        process.stderr.write(stdout);
+      }
+
+      if (stderr) {
+        process.stderr.write(stderr);
+      }
+    });
   });
 
 program
