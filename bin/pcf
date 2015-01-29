@@ -4,6 +4,7 @@ var path = require('path');
 var exec = require('child_process').exec;
 var program = require('commander');
 var Q = require('Q');
+var _ = require('lodash');
 var request = require('request');
 var pkg = require('../package.json');
 var Spec = require('../lib/Spec');
@@ -14,7 +15,35 @@ program.version(pkg.version);
 
 program
   .command('build [dir]')
-  .description('Assemble API Blueprint from directory')
+  .option('-o, --output <outputFile>', 'File to output blueprint to.')
+  .description('Assemble API Blueprint from directory.')
+  .action(function (dir, options) {
+    if (options.output) {
+      Spec
+        .load(dir)
+        .then(function (spec) {
+          return spec.saveBlueprint(options.output);
+        })
+        .done(_.noop, function (err) {
+          throw err;
+        });
+    } else {
+      Spec
+        .load(dir)
+        .then(function (spec) {
+          return spec.loadBlueprint();
+        })
+        .done(function (blueprint) {
+          console.log(blueprint);
+        }, function (err) {
+          throw err;
+        });
+    }
+  });
+
+program
+  .command('validate [dir]')
+  .description('Test for spec errors.')
   .action(function (dir, options) {
     Spec
       .load(dir)
@@ -22,7 +51,7 @@ program
         return spec.loadBlueprint();
       })
       .done(function (blueprint) {
-        console.log(blueprint);
+        console.log('OK');
       }, function (err) {
         throw err;
       });
