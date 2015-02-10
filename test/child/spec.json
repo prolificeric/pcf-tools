@@ -3,7 +3,6 @@
   "inherit": "../parent",
   "features": [
     "overview",
-    "products",
-    "child-specific"
+    "endpoints/products"
   ]
 }
