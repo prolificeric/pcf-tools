@@ -7,8 +7,6 @@
     "pcf": "./bin/pcf"
   },
   "dependencies": {
-    "aglio": "^1.17.1",
-    "body-parser": "^1.10.1",
     "commander": "^2.6.0",
     "content-tree": "^0.0.1",
     "express": "^4.10.7",
@@ -18,7 +16,7 @@
     "mkdirp": "^0.5.0",
     "mocha": "^2.1.0",
     "napa": "^1.1.0",
-    "protagonist": "^0.17.1",
+    "protagonist-experimental": "^0.18.7",
     "q": "^1.1.2",
     "redis": "^0.12.1",
     "request": "^2.51.0",
