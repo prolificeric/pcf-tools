@@ -58,13 +58,6 @@ program
   });
 
 program
-  .command('server <port>')
-  .description('Run a server at specified port')
-  .action(function (port, options) {
-    require('../lib/app').listen(port);
-  });
-
-program
   .command('test [dir] [baseUrl]')
   .description('Test API server against specs.')
   .option('-r, --reporter <reporter>', 'The mocha reporter to use.')
@@ -80,60 +73,6 @@ program
         process.stderr.write(stderr);
       }
     });
-  });
-
-program
-  .command('publish [dir] [baseUrl]')
-  .description('Publish to a PCF server')
-  .action(function (dir, baseUrl, options) {
-    var config = require(path.resolve(process.cwd(), dir, 'spec.json'));
-
-    if (!config.name) {
-      process.stderr.write("spec.json file missing a 'name' property.\n");
-      process.exit();
-    }
-
-    if (!config.version) {
-      process.stderr.write("spec.json file missing a 'version' property.\n");
-      process.exit();
-    }
-
-    var postUri = baseUrl + '/' + config.name + '/' + config.version;
-
-    Spec
-      .load(dir)
-      .then(function (spec) {
-        return spec.loadBlueprint();
-      })
-      .done(function (blueprint) {
-        request({
-          method: 'POST',
-          uri: postUri,
-          body: blueprint,
-          headers: {
-            'Content-Type': 'text/plain'
-          }
-        }, function (err, response) {
-          if (err) {
-            throw err;
-            return;
-          }
-
-          try {
-            var data = JSON.parse(response.body);
-
-            if (data.error) {
-              process.stderr.write('API error: ' + data.error.message);
-            } else {
-              console.log('Spec published to %s', postUri);
-            }
-          } catch (err) {
-            process.stderr.write('API error: ' + response.body);
-          }
-        });
-      }, function (err) {
-        throw err;
-      });
   });
 
 program.parse(process.argv);
