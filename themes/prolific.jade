@@ -118,6 +118,7 @@ mixin ResourceGroup(resourceGroup, getButtonClass, multipage)
                     i.fa.fa-link
         .panel-body
             if resourceGroup.description
+                - try { markdown(resourceGroup.description) } catch (err) { console.log(resourceGroup.description) }
                 != markdown(resourceGroup.description)
             each resource in resourceGroup.resources
                 h4(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}")
@@ -465,10 +466,9 @@ html
               var $key = $('<td class="key" />');
               var $types = $('<td class="types" />');
               var $desc = $('<td class="desc" />').text(property.description);
+              var types = [].concat(property.type);
               
-              property.types = typeof property.type !== 'object'? [property.type]: property.type;
-              
-              $.each(property.types, function (i, type) {
+              $.each(types, function (i, type) {
                 if (type === 'array' && property.items.title) {
                   var $a = $('<a href="javascript:;" />').text(property.items.title + '[]').attr('data-model-ref', type);
                   $a.on('click', function () {
@@ -515,7 +515,7 @@ html
               return $schema;
             }
             
-            $('h5:contains(Schema)').each(function (i) {
+            $('h4, h5').filter(':contains(Schema)').each(function (i) {
               var $pre = $(this).next('pre');
               var json = $pre.text().replace(/\{{2}\}{2}/g, '"');
               
@@ -527,7 +527,7 @@ html
               } catch (e) {
                 var $malformed = $(' <span class="error malformed" />').text('Warning: malformed schema!');
                 $pre.closest('.list-group-item').prev().find('strong').after($malformed);
-                console.log(e);
+                console.log(e.stack);
                 //- throw e;
               }
             });
