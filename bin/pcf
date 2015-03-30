@@ -2,6 +2,7 @@
 
 var path = require('path');
 var exec = require('child_process').exec;
+var fs = require('fs');
 var program = require('commander');
 var Q = require('Q');
 var _ = require('lodash');
@@ -14,31 +15,59 @@ Q.longStackSupport = true;
 program.version(pkg.version);
 
 program
-  .command('build [dir]')
-  .option('-o, --output <outputFile>', 'File to output blueprint to.')
-  .description('Assemble API Blueprint from directory.')
-  .action(function (dir, options) {
-    if (options.output) {
-      Spec
-        .load(dir)
-        .then(function (spec) {
-          return spec.saveBlueprint(options.output);
-        })
-        .done(_.noop, function (err) {
-          throw err;
-        });
-    } else {
-      Spec
-        .load(dir)
-        .then(function (spec) {
-          return spec.loadBlueprint();
-        })
-        .done(function (blueprint) {
-          console.log(blueprint);
-        }, function (err) {
-          throw err;
-        });
+  .command('docs [dir] [outputFile]')
+  .description('Assemble API Blueprint from directory and generate an HTML docs file.')
+  .action(function (dir, outputFile, options) {
+    var blueprintFile = '_blueprint-tmp.md';
+    var command = [
+      'node_modules/.bin/aglio',
+      '-i', blueprintFile,
+      '-o', outputFile
+    ].join(' ');
+
+    function cleanup (err) {
+      fs.unlinkSync(blueprintFile);
     }
+
+    Spec
+      .load(dir)
+      .then(function (spec) {
+        return spec.saveBlueprint(blueprintFile);
+      })
+      .then(function () {
+        return Q.Promise(function (resolve, reject) {
+          exec(command, function (err, stdout, stderr) {
+            var result = err || stderr || stdout;
+
+            if (result) {
+              console.log(result);
+            }
+
+            resolve();
+          });
+        });
+      })
+      .done(cleanup, function (err) {
+        cleanup();
+
+        if (err) {
+          throw err;
+        }
+      });
+  });
+
+program
+  .command('build [dir] [outputFile]')
+  .description('Assemble API Blueprint from directory.')
+  .action(function (dir, outputFile, options) {
+    Spec
+      .load(dir)
+      .then(function (spec) {
+        return spec.saveBlueprint(outputFile);
+      })
+      .done(_.noop, function (err) {
+        throw err;
+      });
   });
 
 program
