@@ -1,6 +1,6 @@
 {
   "name": "pcf-tools",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Stuff that helps you develop and consume APIs.",
   "main": "index.js",
   "bin": {
