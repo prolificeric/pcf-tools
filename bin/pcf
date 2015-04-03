@@ -19,8 +19,9 @@ program
   .description('Assemble API Blueprint from directory and generate an HTML docs file.')
   .action(function (dir, outputFile, options) {
     var blueprintFile = '_blueprint-tmp.md';
+
     var command = [
-      'node_modules/.bin/aglio',
+      path.resolve(__dirname, '../node_modules/.bin/aglio'),
       '-i', blueprintFile,
       '-o', outputFile
     ].join(' ');
